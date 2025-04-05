@@ -12,7 +12,7 @@ def fedavg_lstm(models_dict):
     return global_model
 
 # Usage
-local_models = torch.load("local_lstm_models.pt")
+local_models = torch.load("LSTM/local_lstm_models.pt", weights_only=False)
 global_model = fedavg_lstm(local_models)
 torch.save(global_model.state_dict(), "global_lstm.pt")
 print("Global LSTM model saved.")

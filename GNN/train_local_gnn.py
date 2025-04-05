@@ -19,8 +19,8 @@ class GCN(torch.nn.Module):
         return x
 
 # Load full graph
-graph_data = torch.load("graph_data.pt", weights_only=False)
-region_map = pd.read_csv("station_region_map.csv")
+graph_data = torch.load("GNN/graph_data.pt", weights_only=False)
+region_map = pd.read_csv("GNN/station_region_map.csv")
 
 # Group nodes by region
 region_groups = region_map.groupby("Country").groups
