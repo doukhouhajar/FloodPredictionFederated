@@ -1,4 +1,13 @@
 # FloodPredictionFederated
+##  HELLO AFRICA ! 
+
+**Sobek** is a team of three young engineering students from **ENSIAS** (École Nationale Supérieure d'Informatique et d'Analyse des Systèmes), united by a shared mission: empowering African communities with **equitable access to climate intelligence**.
+
+This project, developed as part of the **AI in Africa Challenge**, tackles one of the continent’s most pressing challenges — **flood risk prediction** — through an innovative, federated, and privacy-preserving approach to machine learning.
+
+Inspired by the principles of **data democracy**, **African data sovereignty**, and **urban resilience in low-resource settings**, the Sobek team envisions a future where **decentralized AI tools** help even the most data-scarce regions prepare for climate shocks.
+
+We designed this repository as a modular, open-source blueprint for **multi-country collaboration**, where every city — no matter how small or underfunded — can contribute to and benefit from collective intelligence.
 
 **Multi-Model Federated Learning for African Flood Risk Intelligence and Data Democracy**
 
