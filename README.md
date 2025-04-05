@@ -113,5 +113,10 @@ FloodPredictionFederated/
 
 ##  Acknowledgments
 
-This project builds upon work done in the **ADHI**, **FloodNet**, and **Digital Earth Africa** initiatives, as well as the open-source communities of **PySyft**, **Flower**, and **FedML**.
+This project was developed as part of the **AI in Africa Challenge**, led by the **Sobek** team. We extend our gratitude to the broader ecosystems that have supported our vision of democratizing flood prediction for Africa:
 
+- **ADHI** (African Database of Hydrological Information) for foundational datasets.
+- **FloodNet** and **Digital Earth Africa** for their contributions to environmental data accessibility across the continent.
+- The open-source communities behind **PySyft**, **Flower**, and **FedML** — whose federated learning frameworks made our decentralized, privacy-preserving architecture possible.
+
+This work reflects a commitment to **African-led innovation**, **community-based resilience**, and **open, inclusive AI for good**.
