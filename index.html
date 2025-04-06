@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI4SDG11 - Federated Models</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8fafc;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(120deg, #667eea, #764ba2);
+      color: white;
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      backdrop-filter: blur(4px);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 36px rgba(31, 38, 135, 0.2);
+    }
+    
+    .model-card {
+      border-left: 4px solid transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .model-card:hover {
+      border-left-color: #6366f1;
+    }
+    
+    .model-card.active {
+      border-left-color: #6366f1;
+      background-color: #f0f4ff;
+    }
+    
+    .country {
+      transition: all 0.4s ease;
+      cursor: pointer;
+      fill: #cbd5e1;
+      stroke: #475569;
+      stroke-width: 0.5;
+    }
+    
+    .country:hover {
+      fill: #94a3b8;
+    }
+    
+    .selected {
+      fill: #818cf8 !important;
+      filter: drop-shadow(0 4px 3px rgba(79, 70, 229, 0.3));
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        filter: drop-shadow(0 0 0 rgba(79, 70, 229, 0.7));
+      }
+      70% {
+        filter: drop-shadow(0 0 10px rgba(79, 70, 229, 0));
+      }
+      100% {
+        filter: drop-shadow(0 0 0 rgba(79, 70, 229, 0));
+      }
+    }
+    
+    .info-card {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease;
+    }
+    
+    .info-card.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .stat-value {
+      color: #4f46e5;
+      font-weight: 600;
+    }
+    
+    .ocean {
+      fill: #e0f2fe;
+    }
+    
+    .map-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    
+    .map-title {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 12px;
+      color: #475569;
+    }
+    
+    .progress {
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #4f46e5, #818cf8);
+    }
+  </style>
+</head>
+<body>
+  <div class="max-w-6xl mx-auto p-6">
+    <div class="gradient-bg p-6 rounded-xl shadow-lg mb-8">
+      <h1 class="text-3xl font-bold text-center">AI4SDG11 - Federated Models</h1>
+      <p class="text-center opacity-90 mt-2">Collaborative AI for Sustainable Development Goal 11: Sustainable Cities & Communities</p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-4">
+        <div class="glass-card p-4 mb-6">
+          <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-indigo-600">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            Federated Models
+          </h2>
+          <p class="text-gray-600 text-sm mb-4">Select a model to view contributing countries and detailed statistics</p>
+          
+          <div id="modelList" class="space-y-3"></div>
+        </div>
+        
+        <div class="glass-card p-4">
+          <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-indigo-600">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Model Information
+          </h2>
+          <div id="modelInfo" class="text-gray-600 text-sm">
+            <p>This dashboard visualizes flood prediction models developed through federated learning across African nations. Each contributing country maintains data sovereignty while collaborating on a shared AI model.</p>
+            <p class="mt-2">The highlighted countries represent active contributors to the selected model. Click on a country to view its specific risk metrics and contribution data.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lg:col-span-8">
+        <div class="glass-card mb-6">
+          <div class="map-container">
+            <div class="map-title">Geographic Distribution of Contributors</div>
+            <svg id="africaMap" viewBox="0 0 800 900" class="w-full h-96">
+              <!-- Background -->
+              <rect x="0" y="0" width="800" height="900" class="ocean" />
+              
+              <!-- Simplified SVG map of Africa with focus on Nigeria, Kenya and South Africa -->
+              <!-- North Africa -->
+              <path d="M330,140 L390,130 L440,150 L480,150 L510,180 L500,210 L450,250 L400,280 L350,260 L320,230 L330,180 Z" class="country" />
+              
+              <!-- West Africa -->
+              <path d="M280,250 L320,230 L350,260 L340,290 L290,310 L260,290 Z" class="country" />
+              
+              <!-- Nigeria -->
+              <path id="NG" d="M360,320 L390,300 L420,310 L430,340 L410,370 L380,380 L350,360 L350,330 Z" class="country" />
+              
+              <!-- Central Africa -->
+              <path d="M380,380 L410,370 L450,390 L440,430 L400,460 L370,440 L360,410 Z" class="country" />
+              
+              <!-- North East Africa -->
+              <path d="M450,250 L500,210 L550,210 L590,250 L570,320 L520,310 L490,280 Z" class="country" />
+              
+              <!-- Horn of Africa -->
+              <path d="M520,310 L570,320 L590,350 L570,380 L540,400 L510,390 L500,350 Z" class="country" />
+              
+              <!-- Kenya -->
+              <path id="KE" d="M510,390 L540,400 L560,410 L550,450 L520,470 L490,450 L480,420 L490,400 Z" class="country" />
+              
+              <!-- Tanzania -->
+              <path d="M480,420 L490,450 L520,470 L500,500 L460,510 L440,490 L450,460 Z" class="country" />
+              
+              <!-- DRC/Angola -->
+              <path d="M400,460 L440,490 L430,540 L400,580 L370,560 L350,520 L370,480 Z" class="country" />
+              
+              <!-- East Africa -->
+              <path d="M500,500 L530,510 L540,550 L520,600 L490,620 L470,590 L480,550 L470,510 Z" class="country" />
+              
+              <!-- Namibia/Botswana -->
+              <path d="M370,560 L400,580 L430,600 L420,640 L380,650 L350,630 L340,590 Z" class="country" />
+              
+              <!-- South Africa -->
+              <path id="ZA" d="M420,640 L470,630 L490,620 L510,640 L500,680 L460,710 L420,700 L390,670 L380,650 Z" class="country" />
+              
+              <!-- Madagascar -->
+              <path d="M560,530 L580,540 L570,580 L550,590 L530,570 L540,540 Z" class="country" />
+              
+              <!-- Country labels -->
+              <text x="375" y="340" font-size="12" fill="#334155" text-anchor="middle" font-weight="500">Nigeria</text>
+              <text x="515" y="430" font-size="12" fill="#334155" text-anchor="middle" font-weight="500">Kenya</text>
+              <text x="450" y="670" font-size="12" fill="#334155" text-anchor="middle" font-weight="500">South Africa</text>
+            </svg>
+          </div>
+        </div>
+        
+        <div id="countryDetails">
+          <div id="noCountrySelected" class="glass-card p-4 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 text-gray-400">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            <p class="text-gray-500">Select a model to visualize contributing countries and their details</p>
+          </div>
+          
+          <!-- Country info cards -->
+          <div id="NG-info" class="info-card glass-card p-5 mt-4">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-semibold text-gray-800">Nigeria</h3>
+              <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">West Africa</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Flood Risk Level</h4>
+                <div class="flex items-center">
+                  <div class="grow mr-4">
+                    <div class="progress">
+                      <div id="NG-risk-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                  </div>
+                  <div id="NG-risk" class="stat-value text-lg"></div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Peak Discharge</h4>
+                <div id="NG-discharge" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Last Recorded Flood</h4>
+                <div id="NG-flood" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Flood Seasonality</h4>
+                <div id="NG-season" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Monitoring Stations</h4>
+                <div id="NG-stations" class="stat-value text-lg"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="KE-info" class="info-card glass-card p-5 mt-4">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-semibold text-gray-800">Kenya</h3>
+              <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">East Africa</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Flood Risk Level</h4>
+                <div class="flex items-center">
+                  <div class="grow mr-4">
+                    <div class="progress">
+                      <div id="KE-risk-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                  </div>
+                  <div id="KE-risk" class="stat-value text-lg"></div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Peak Discharge</h4>
+                <div id="KE-discharge" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Last Recorded Flood</h4>
+                <div id="KE-flood" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Flood Seasonality</h4>
+                <div id="KE-season" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Monitoring Stations</h4>
+                <div id="KE-stations" class="stat-value text-lg"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="ZA-info" class="info-card glass-card p-5 mt-4">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-semibold text-gray-800">South Africa</h3>
+              <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">Southern Africa</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Flood Risk Level</h4>
+                <div class="flex items-center">
+                  <div class="grow mr-4">
+                    <div class="progress">
+                      <div id="ZA-risk-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                  </div>
+                  <div id="ZA-risk" class="stat-value text-lg"></div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Peak Discharge</h4>
+                <div id="ZA-discharge" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Last Recorded Flood</h4>
+                <div id="ZA-flood" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Flood Seasonality</h4>
+                <div id="ZA-season" class="stat-value text-lg"></div>
+              </div>
+              
+              <div>
+                <h4 class="text-sm font-medium text-gray-500 mb-1">Monitoring Stations</h4>
+                <div id="ZA-stations" class="stat-value text-lg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Model data
+    const models = [
+      {
+        name: 'FloodNet Prime',
+        description: 'Comprehensive flood prediction model with high accuracy',
+        contributorCount: 3,
+        contributors: ['Nigeria', 'Kenya', 'South Africa'],
+        contributions: {
+          NG: {
+            risk: 70,
+            peakDischarge: '3,000 m³/s',
+            lastFlood: 'August 12, 2023',
+            seasonality: 'June - September',
+            stations: 5,
+          },
+          KE: {
+            risk: 50,
+            peakDischarge: '1,200 m³/s',
+            lastFlood: 'November 3, 2022',
+            seasonality: 'March - May',
+            stations: 3,
+          },
+          ZA: {
+            risk: 40,
+            peakDischarge: '800 m³/s',
+            lastFlood: 'February 14, 2021',
+            seasonality: 'December - February',
+            stations: 4,
+          },
+        },
+      },
+      {
+        name: 'HydroSense',
+        description: 'Specialized for seasonal flooding events',
+        contributorCount: 2,
+        contributors: ['Kenya', 'South Africa'],
+        contributions: {
+          KE: {
+            risk: 65,
+            peakDischarge: '1,500 m³/s',
+            lastFlood: 'April 18, 2023',
+            seasonality: 'March - May',
+            stations: 4,
+          },
+          ZA: {
+            risk: 55,
+            peakDischarge: '950 m³/s',
+            lastFlood: 'January 20, 2022',
+            seasonality: 'December - March',
+            stations: 5,
+          },
+        },
+      },
+      {
+        name: 'RapidAlert',
+        description: 'Optimized for rapid onset flash flood events',
+        contributorCount: 1,
+        contributors: ['Nigeria'],
+        contributions: {
+          NG: {
+            risk: 80,
+            peakDischarge: '3,500 m³/s',
+            lastFlood: 'July 30, 2024',
+            seasonality: 'July - October',
+            stations: 7,
+          },
+        },
+      }
+    ];
+
+    const modelList = document.getElementById('modelList');
+    const countryMap = {
+      'Nigeria': 'NG',
+      'Kenya': 'KE',
+      'South Africa': 'ZA'
+    };
+    
+    function clearMap() {
+      document.querySelectorAll('.country').forEach(el => {
+        el.classList.remove('selected', 'pulse');
+        el.setAttribute('fill', '#cbd5e1');
+      });
+      
+      document.querySelectorAll('.info-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      
+      document.getElementById('noCountrySelected').style.display = 'block';
+    }
+    
+    function updateCountryInfo(modelData, countryCode) {
+      const data = modelData.contributions[countryCode];
+      if (data) {
+        document.getElementById(`${countryCode}-risk`).textContent = `${data.risk}%`;
+        document.getElementById(`${countryCode}-risk-bar`).style.width = `${data.risk}%`;
+        document.getElementById(`${countryCode}-discharge`).textContent = data.peakDischarge;
+        document.getElementById(`${countryCode}-flood`).textContent = data.lastFlood;
+        document.getElementById(`${countryCode}-season`).textContent = data.seasonality;
+        document.getElementById(`${countryCode}-stations`).textContent = data.stations;
+      }
+    }
+    
+    // Create model buttons
+    models.forEach((model, index) => {
+      const div = document.createElement('div');
+      div.className = 'model-card p-4 rounded-md cursor-pointer hover:bg-gray-50 transition';
+      div.innerHTML = `
+        <h3 class="text-lg font-semibold text-gray-800">${model.name}</h3>
+        <p class="text-sm text-gray-500 mt-1">${model.description}</p>
+        <div class="flex items-center text-xs text-gray-600 mt-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          ${model.contributorCount} contributors: ${model.contributors.join(', ')}
+        </div>
+      `;
+      
+      div.addEventListener('click', () => {
+        // Clear previous selections
+        document.querySelectorAll('.model-card').forEach(item => {
+          item.classList.remove('active');
+        });
+        
+        // Highlight selected model
+        div.classList.add('active');
+        
+        // Clear and update map
+        clearMap();
+        document.getElementById('noCountrySelected').style.display = 'none';
+        
+        // Highlight countries and show their info
+        model.contributors.forEach(country => {
+          const code = countryMap[country];
+          if (code) {
+            const countryEl = document.getElementById(code);
+            const infoCard = document.getElementById(`${code}-info`);
+            
+            if (countryEl) {
+              countryEl.classList.add('selected', 'pulse');
+            }
+            
+            if (infoCard) {
+              infoCard.classList.add('active');
+              updateCountryInfo(model, code);
+            }
+          }
+        });
+      });
+      
+      modelList.appendChild(div);
+    });
+    
+    // Add click events to countries on the map
+    document.querySelectorAll('.country').forEach(country => {
+      country.addEventListener('click', () => {
+        const countryId = country.id;
+        if (!countryId) return; // Skip if this country isn't one of our target countries
+        
+        // Find which model is currently active
+        const activeModelElement = document.querySelector('.model-card.active');
+        if (activeModelElement) {
+          const activeModelIndex = Array.from(modelList.children).indexOf(activeModelElement);
+          const activeModel = models[activeModelIndex];
+          
+          // Check if this country is part of the active model
+          if (activeModel.contributors.includes(Object.keys(countryMap).find(key => countryMap[key] === countryId))) {
+            // Toggle country highlight
+            const infoCard = document.getElementById(`${countryId}-info`);
+            
+            if (country.classList.contains('selected')) {
+              country.classList.remove('selected', 'pulse');
+              infoCard.classList.remove('active');
+            } else {
+              country.classList.add('selected', 'pulse');
+              infoCard.classList.add('active');
+            }
+          }
+        }
+      });
+    });
+    
+    // Auto-select the first model on load
+    setTimeout(() => {
+      document.querySelector('.model-card').click();
+    }, 500);
+  </script>
+</body>
+</html>
